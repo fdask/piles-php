@@ -152,7 +152,7 @@ class Conveyor {
                         if ($this->playerY == $y && $this->playerX == $x) {
                             $ret[$y] .= Colors::fg_color('white', "[ ]");
                         } else {
-                            $ret[$y] .= "  ";
+                            $ret[$y] .= "   ";
                         }
                     }
                 }
