@@ -1,7 +1,6 @@
 <?php
 class Conveyor {
     private $wheel1;
-    private $wheel2;
 
     // how much space we have
     private $length;
@@ -23,8 +22,7 @@ class Conveyor {
 
     public function __construct() {
         $this->wheel1 = new Wheel();
-        $this->wheel2 = new Wheel("-");
-
+        
         $this->advanceTicker = 0;
         $this->playerX = 0;
         $this->playerY = 0;
@@ -94,6 +92,12 @@ class Conveyor {
         
     }
 
+    public function addCounter($c) {
+        if (isset($this->contents[$this->playerX]) && !is_null($this->contents[$this->playerX])) {
+            $this->contents[$this->playerX]->addCounter($c);
+        }
+    }
+
     public function tick() {
         $this->advanceTicker++;
 
@@ -102,7 +106,6 @@ class Conveyor {
             $this->advance();
             
             $this->wheel1->tick();
-            $this->wheel2->tick();
 
             // tick the piles
             for ($x = 0; $x < $this->length; $x++) {
@@ -205,8 +208,38 @@ class Conveyor {
         }
         
         if (Config::$debug) {
-            $ret[Config::$maxPileHeight + 3] = "player x: " . $this->playerX . " y: " . $this->playerY;
-            $ret[Config::$maxPileHeight + 4] = "advanceTicker: " . $this->advanceTicker . " speed: " . $this->speed;
+            $line1 = "";
+            $line2 = "";
+
+            for ($x = $this->length - 1; $x >= 0; $x--) {
+                if (!is_null($this->contents[$x])) {
+                    $counters = $this->contents[$x]->getCounters();
+
+                    if (in_array("ALLUP", $counters)) {
+                        $line1 .= "  " . Config::arrowUp() . " ";
+                    } else if (in_array("ALLDOWN", $counters)) {
+                        $line1 .= "  " . Config::arrowDown() . " ";
+                    } else {
+                        $line1 .= "    ";    
+                    }
+                    
+                    if (in_array("SINGLELEFT", $counters)) {
+                        $line2 .= "  " . Config::arrowLeft() . " ";
+                    } else if (in_array("SINGLERIGHT", $counters)) {
+                        $line2 .= "  " . Config::arrowRight() . " ";
+                    } else {
+                        $line2 .= "    ";
+                    }
+                } else {
+                    $line1 .= "    ";
+                    $line2 .= "    ";
+                }
+            }
+
+            $ret[Config::$maxPileHeight + 3] = $line1;
+            $ret[Config::$maxPileHeight + 4] = $line2;
+            //$ret[Config::$maxPileHeight + 3] = "player x: " . $this->playerX . " y: " . $this->playerY;
+            //$ret[Config::$maxPileHeight + 4] = "advanceTicker: " . $this->advanceTicker . " speed: " . $this->speed;
         }
 
         return $ret;

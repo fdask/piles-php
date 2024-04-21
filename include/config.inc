@@ -162,13 +162,23 @@ class Config {
 
             foreach ($data as $count => $d) {
                 if (isset($d[$line])) {
-                    if (strlen(Colors::stripColor($d[$line])) <= $widths[$count]) {
-                        $print = str_pad($d[$line], $widths[$count]);
+                    $str = Colors::stripColor($d[$line]);
+
+                    if (Config::containsMb($str)) {
+                        if (mb_strlen($str) <= $widths[$count]) {
+                            $print = str_pad($d[$line], $widths[$count]) . "|";
+                        } else {
+                            $print = mb_substr($d[$line], 0, $widths[$count]) . "|";
+                        }
                     } else {
-                        $print = substr($d[$line], 0, $widths[$count]);
+                        if (strlen($str) <= $widths[$count]) {
+                            $print = str_pad($d[$line], $widths[$count]) . "|";
+                        } else {
+                            $print = substr($d[$line], 0, $widths[$count]) . "|";
+                        }
                     }
                 } else {
-                    $print = str_pad(" ", $widths[$count]);
+                    $print = str_pad(" ", $widths[$count]) . "|";
                 }
 
                 $curStr .= $print;
@@ -179,9 +189,26 @@ class Config {
 
         return $ret;
     }
+
+    public static function containsMb($str) {
+        return !mb_check_encoding($str, 'ASCII') && mb_check_encoding($str, 'UTF-8');
+    }
 }
 
 spl_autoload_register("Config::autoload");
+
+/*
+$string = "hello left arrow";
+$string2 = "hello" . Config::arrowLeft() . " hat.";
+
+if (Config::containsMb($string2)) {
+    echo "String contains mb!\n";
+    exit;
+} else {
+    echo "String has no mb!\n";
+}
+exit;
+*/
 
 /*
 $plain = "0123456789";

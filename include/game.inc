@@ -49,9 +49,21 @@ class Game {
                     $this->draw();
 
 					break;
+                case Config::keypressShiftUpArrow():
+                    $this->conveyor->addCounter("ALLUP");
+
+                    $this->draw();
+
+                    break;
                 case Config::keypressDownArrow():
                     $this->conveyor->moveDown();
                 
+                    $this->draw();
+
+                    break;
+                case Config::keypressShiftDownArrow():
+                    $this->conveyor->addCounter("ALLDOWN");
+
                     $this->draw();
 
                     break;
@@ -61,8 +73,20 @@ class Game {
                     $this->draw();
 
                     break;
+                case Config::keypressShiftLeftArrow():
+                    $this->conveyor->addCounter("SINGLELEFT");
+
+                    $this->draw();
+
+                    break;
                 case Config::keypressRightArrow():
                     $this->conveyor->moveRight();
+
+                    $this->draw();
+
+                    break;
+                case Config::keypressShiftRightArrow():
+                    $this->conveyor->addCounter("SINGLERIGHT");
 
                     $this->draw();
 
@@ -100,7 +124,11 @@ class Game {
         $conveyorWidth = 0;
 
         foreach ($conveyor as $line) {
-            $lineWidth = strlen(Colors::stripColor($line));
+            if (Config::containsMb(Colors::stripColor($line))) {
+                $lineWidth = 0;
+            } else {
+                $lineWidth = strlen(Colors::stripColor($line));
+            }
 
             if ($lineWidth > $conveyorWidth) {
                 $conveyorWidth = $lineWidth;
@@ -111,7 +139,11 @@ class Game {
         $assemblerWidth = 0;
 
         foreach ($assembler as $line) {
-            $lineWidth = strlen(Colors::stripColor($line));
+            if (Config::containsMb(Colors::stripColor($line))) {
+                $lineWidth = 0;
+            } else {
+                $lineWidth = strlen(Colors::stripColor($line));
+            }
 
             if ($lineWidth > $assemblerWidth) {
                 $assemblerWidth = $lineWidth;
