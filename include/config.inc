@@ -126,7 +126,9 @@ class Config {
 	}
 
     public static function draw($display) {
-        system("clear");
+        if (!Config::$debug) {
+            system("clear");
+        }
 
         for ($x = 0; $x < count($display); $x++) {
             if (isset($display[$x])) {
@@ -182,6 +184,14 @@ class Config {
 spl_autoload_register("Config::autoload");
 
 /*
+$plain = "0123456789";
+$shushed = "012" . Colors::fg_color('white', "[45]") . "789";
+
+echo strlen(Colors::stripColor($plain)) . "\n";
+echo strlen(Colors::stripColor($shushed)) . "\n";
+exit;
+*/
+/*
 $widths = array(40, 20);
 $data = array(
     array(
@@ -200,6 +210,33 @@ $data = array(
 );
 
 $d = Config::drawTable($widths, $data);
+Config::draw($d);
+exit;
+*/
+/*
+$data1 = array(
+    '  9   8   7   6   5   4   3   2   1   0 ',
+    '|===-===-===-===-===-===-===-===-===-===-',
+    '                                        ',
+    '                                        ',
+    '                                     [ ]',
+    '                                        ',
+    '                                        ',
+    "player x: 0 y: 2",
+    "advanceTicker: 0 speed: 1"
+);
+
+$widths1 = array(
+    '  W  ',
+    '  Y  ',
+    '  O  ',
+    '  Z  ',
+    '    ',
+    ' === ',
+    '  X  '
+);
+
+$d= Config::drawTable($widths1, $data1);
 Config::draw($d);
 exit;
 */

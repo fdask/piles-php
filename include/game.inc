@@ -12,6 +12,8 @@ class Game {
         $this->term = `stty -g`;
 		system("stty -icanon -echo");
 
+        echo "\n";
+
 		$this->ticks = 0;
 
         $this->conveyor = new Conveyor();
@@ -51,7 +53,7 @@ class Game {
                     $this->conveyor->moveDown();
                 
                     $this->draw();
-                    
+
                     break;
                 case Config::keypressLeftArrow():
                     $this->conveyor->moveLeft();
@@ -82,15 +84,11 @@ class Game {
 
         // check if the assembler is completed
         if ($this->assembler->isDone()) {
-            echo "Assembler is done!\n";
-            
             $pile = $this->assembler->getPile();
- 
             $this->conveyor->addPile($pile);
-            
+           
             $this->assembler->reset();
-        }
-        
+        }        
     }
 
     public function draw() {

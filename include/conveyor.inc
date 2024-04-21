@@ -1,5 +1,8 @@
 <?php
 class Conveyor {
+    private $wheel1;
+    private $wheel2;
+
     // how much space we have
     private $length;
     
@@ -19,9 +22,13 @@ class Conveyor {
     private $playerY;
 
     public function __construct() {
+        $this->wheel1 = new Wheel();
+        $this->wheel2 = new Wheel("-");
+
         $this->advanceTicker = 0;
         $this->playerX = 0;
         $this->playerY = 0;
+        $this->speed = 1;
         $this->length = Config::$defaultConveyorLength;
         
         $this->contents = array();
@@ -68,34 +75,23 @@ class Conveyor {
     }
 
     public function moveUp() {
-        /*if (is_null($this->contents[$this->playerX])) {
-            $colHeight = 0;
-        } else {
-            $colHeight = count($this->contents[$this->playerX]->getChars()) - 1;
-        }
-    
-        $maxHeight = Config::$maxPileHeight - 1;
-        $minHeight = $maxHeight - $colHeight;
-        
-        if ($this->playerY >= $minHeight) {
-            $this->playerY--;
-        } else {
-            $this->playerY = $maxHeight;
-        }
-        */
         if ($this->playerY > 0) {
             $this->playerY--;
+        } else {
+            $this->playerY = Config::$maxPileHeight - 1;
         }
     }
 
     public function moveDown() {
         if ($this->playerY < Config::$maxPileHeight - 1) {
             $this->playerY++;
+        } else {
+            $this->playerY = 0;
         }
     }
 
     public function advance() {
-
+        
     }
 
     public function tick() {
@@ -104,6 +100,16 @@ class Conveyor {
         if ($this->advanceTicker == $this->speed) {
             $this->advanceTicker = 0;
             $this->advance();
+            
+            $this->wheel1->tick();
+            $this->wheel2->tick();
+
+            // tick the piles
+            for ($x = 0; $x < $this->length; $x++) {
+                if (!is_null($this->contents[$x])) {
+                     $this->contents[$x]->tick();
+                }
+            }
         }
     }
 
@@ -125,11 +131,11 @@ class Conveyor {
             }
 
             if (!isset($ret[Config::$maxPileHeight + 1])) {
-                $ret[Config::$maxPileHeight + 1] = "";
+                $ret[Config::$maxPileHeight + 1] = " ";
             }
 
             if (!isset($ret[Config::$maxPileHeight])) {
-                $ret[Config::$maxPileHeight] = "";
+                $ret[Config::$maxPileHeight] = $this->wheel1->draw();
             }
 
             if ($x == $this->length - 1) {               
@@ -138,7 +144,7 @@ class Conveyor {
                     // if the line doesn't exist yet in the return array
                     // add a blank one
                     if (!isset($ret[$y])) {
-                        $ret[$y] = "";
+                        $ret[$y] = " ";
                     }
 
                     // add item from the chars array
@@ -172,7 +178,7 @@ class Conveyor {
                 for ($y = Config::$maxPileHeight - 1; $y >= 0; $y--) {
                     if (!empty($chars)) {
                         if ($y == $this->playerY && $this->playerX == $x) {
-                            $ret[$y] .= Colors::fg_color('white', " [" . array_pop($chars) . "]");
+                            $ret[$y] .= " " . Colors::fg_color('white', "[" . array_pop($chars) . "]");
                         } else {
                             $ret[$y] .= "  " . array_pop($chars) . " ";
                         }
@@ -197,9 +203,10 @@ class Conveyor {
                 $ret[Config::$maxPileHeight + 1] .= " ";
             }
         }
-
+        
         if (Config::$debug) {
             $ret[Config::$maxPileHeight + 3] = "player x: " . $this->playerX . " y: " . $this->playerY;
+            $ret[Config::$maxPileHeight + 4] = "advanceTicker: " . $this->advanceTicker . " speed: " . $this->speed;
         }
 
         return $ret;
