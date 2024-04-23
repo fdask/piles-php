@@ -37,19 +37,13 @@ class Conveyor {
     }
 
     public function countPiles() {
-        $count = 0;
-
-        foreach ($this->contents as $c) {
-            if (!is_null($c)) {
-                $count++;
-            }
-        }
-
-        return $count;
+        return count($this->contents);
     }
 
     public function addPile(Pile $p) {
-        if ($this->countPiles() + 1 >= $this->length) {
+        echo "Adding a pile (" . $this->countPiles() . ") (" . $this->length . ")\n";
+    
+        if ($this->countPiles() > $this->length - 1) {
             $pop = array_pop($this->contents);
         } else {
             $pop = null;

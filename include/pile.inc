@@ -81,6 +81,20 @@ class Pile {
         }
     }
 
+    public function isCountered() {
+        foreach ($this->behaviors as $behavior) {
+            if (!in_array($behavior, $this->counters)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function getBehaviors() {
+        return $this->behaviors;
+    }
+    
     public function addChar($c) {
         $this->characters[] = $c;
     }

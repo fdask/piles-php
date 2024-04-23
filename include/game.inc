@@ -1,9 +1,9 @@
 <?php
 class Game {
-	private $constructor;
-    private $assembler;
+	private $assembler;
     private $conveyor;
-    
+    private $status;
+
     private $ticks;
     private $display;
 	private $term;
@@ -18,6 +18,7 @@ class Game {
 
         $this->conveyor = new Conveyor();
         $this->assembler = new Assembler();
+        $this->status = new Status();
 
 		stream_set_blocking(STDIN, false); // Do not wait
 
@@ -105,11 +106,44 @@ class Game {
     public function tick() {
         $this->conveyor->tick();
         $this->assembler->tick();
+        $this->status->tick();
 
         // check if the assembler is completed
         if ($this->assembler->isDone()) {
             $pile = $this->assembler->getPile();
-            $this->conveyor->addPile($pile);
+            
+            $popped = $this->conveyor->addPile($pile);
+
+            // check the pile that popped off
+            if (!is_null($popped)) {
+                if ($popped->isCountered()) {
+                    $score = 0;
+
+                    // pile is properly countered
+                    $behaviors = $popped->getBehaviors();
+
+                    if (in_array("SINGLERIGHT", $behaviors) || in_array("SINGLELEFT", $behaviors)) {
+                        $score += Config::$leftRightScore;
+                    }
+                    
+                    if (in_array("ALLUP", $behaviors) || in_array("ALLDOWN", $behaviors)) {
+                        $score += Config::$upDownScore;
+                    }
+                    
+                    $msg = Colors::fg_color('green', "ok!");
+
+                    if ($score > 0) {
+                        $msg .= " +$score";
+                    }
+                    $this->status->addMsg($msg);
+                    $this->status->addHit();
+                    $this->draw();
+                } else {
+                    $this->status->addMiss();
+                    $this->status->addMsg(Colors::fg_color('red', "miss!"));
+                    $this->draw();
+                }
+            }
            
             $this->assembler->reset();
         }        
@@ -119,6 +153,7 @@ class Game {
         // rebuild the display
         $conveyor = $this->conveyor->draw();
         $assembler = $this->assembler->draw();
+        $status = $this->status->draw();
 
         // get the longest conveyor line
         $conveyorWidth = 0;
@@ -150,8 +185,19 @@ class Game {
             }
         }
 
+        // get the longest status screen
+        $statusWidth = 0;
+
+        foreach ($status as $line) {
+            $lineWidth = strlen(Colors::stripColor($line));
+
+            if ($lineWidth > $statusWidth) {
+                $statusWidth = $lineWidth;
+            }
+        }
+
         // draw the conveyor and assembler into a table
-        $table = Config::drawTable(array($conveyorWidth, $assemblerWidth), array($conveyor, $assembler));
+        $table = Config::drawTable(array($conveyorWidth, $assemblerWidth, $statusWidth), array($conveyor, $assembler, $status));
         
         // print!
         Config::draw($table);
@@ -160,6 +206,7 @@ class Game {
     public function gameOver() {
 		echo "GAME OVER\n\n";
 
+        var_dump($this->status);
 		// quit the game
 		system("stty " . $this->term);
 
