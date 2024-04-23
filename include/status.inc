@@ -35,8 +35,8 @@ class Status {
     public function draw() {
         $ret = array();
 
-        $ret[] = "score: " . $this->score;
-        $ret[] = "hits: " . $this->hits;
+        $ret[] = "score:  " . $this->score;
+        $ret[] = "hits:   " . $this->hits;
         $ret[] = "misses: " . $this->misses;
 
         $msgs = array_slice($this->msgs, -3, 3, true);

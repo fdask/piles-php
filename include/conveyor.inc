@@ -41,8 +41,6 @@ class Conveyor {
     }
 
     public function addPile(Pile $p) {
-        echo "Adding a pile (" . $this->countPiles() . ") (" . $this->length . ")\n";
-    
         if ($this->countPiles() > $this->length - 1) {
             $pop = array_pop($this->contents);
         } else {
@@ -209,17 +207,17 @@ class Conveyor {
                 if (!is_null($this->contents[$x])) {
                     $counters = $this->contents[$x]->getCounters();
 
-                    if (in_array("ALLUP", $counters)) {
+                    if (in_array(Pile::$behaviorUp, $counters)) {
                         $line1 .= "  " . Config::arrowUp() . " ";
-                    } else if (in_array("ALLDOWN", $counters)) {
+                    } else if (in_array(Pile::$behaviorDown, $counters)) {
                         $line1 .= "  " . Config::arrowDown() . " ";
                     } else {
                         $line1 .= "    ";    
                     }
                     
-                    if (in_array("SINGLELEFT", $counters)) {
+                    if (in_array(Pile::$behaviorLeft, $counters)) {
                         $line2 .= "  " . Config::arrowLeft() . " ";
-                    } else if (in_array("SINGLERIGHT", $counters)) {
+                    } else if (in_array(Pile::$behaviorRight, $counters)) {
                         $line2 .= "  " . Config::arrowRight() . " ";
                     } else {
                         $line2 .= "    ";
@@ -232,8 +230,6 @@ class Conveyor {
 
             $ret[Config::$maxPileHeight + 3] = $line1;
             $ret[Config::$maxPileHeight + 4] = $line2;
-            //$ret[Config::$maxPileHeight + 3] = "player x: " . $this->playerX . " y: " . $this->playerY;
-            //$ret[Config::$maxPileHeight + 4] = "advanceTicker: " . $this->advanceTicker . " speed: " . $this->speed;
         }
 
         return $ret;

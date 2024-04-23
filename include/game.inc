@@ -51,7 +51,7 @@ class Game {
 
 					break;
                 case Config::keypressShiftUpArrow():
-                    $this->conveyor->addCounter("ALLUP");
+                    $this->conveyor->addCounter(Pile::$behaviorUp);
 
                     $this->draw();
 
@@ -63,7 +63,7 @@ class Game {
 
                     break;
                 case Config::keypressShiftDownArrow():
-                    $this->conveyor->addCounter("ALLDOWN");
+                    $this->conveyor->addCounter(Pile::$behaviorDown);
 
                     $this->draw();
 
@@ -75,7 +75,7 @@ class Game {
 
                     break;
                 case Config::keypressShiftLeftArrow():
-                    $this->conveyor->addCounter("SINGLELEFT");
+                    $this->conveyor->addCounter(Pile::$behaviorLeft);
 
                     $this->draw();
 
@@ -87,7 +87,7 @@ class Game {
 
                     break;
                 case Config::keypressShiftRightArrow():
-                    $this->conveyor->addCounter("SINGLERIGHT");
+                    $this->conveyor->addCounter(Pile::$behaviorRight);
 
                     $this->draw();
 
@@ -122,11 +122,11 @@ class Game {
                     // pile is properly countered
                     $behaviors = $popped->getBehaviors();
 
-                    if (in_array("SINGLERIGHT", $behaviors) || in_array("SINGLELEFT", $behaviors)) {
+                    if (in_array(Pile::$behaviorRight, $behaviors) || in_array(Pile::$behaviorLeft, $behaviors)) {
                         $score += Config::$leftRightScore;
                     }
                     
-                    if (in_array("ALLUP", $behaviors) || in_array("ALLDOWN", $behaviors)) {
+                    if (in_array(Pile::$behaviorUp, $behaviors) || in_array(Pile::$behaviorDown, $behaviors)) {
                         $score += Config::$upDownScore;
                     }
                     
@@ -134,7 +134,9 @@ class Game {
 
                     if ($score > 0) {
                         $msg .= " +$score";
+                        $this->status->addScore($score);
                     }
+
                     $this->status->addMsg($msg);
                     $this->status->addHit();
                     $this->draw();
@@ -206,8 +208,7 @@ class Game {
     public function gameOver() {
 		echo "GAME OVER\n\n";
 
-        var_dump($this->status);
-		// quit the game
+        // quit the game
 		system("stty " . $this->term);
 
 		exit;
